@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Login Successful!</h1>
+    <img src="{{ user_info['picture'] }}" width="120">
+    <p>Hello {{ user_info['name'] }}</p>
+    <p>You are signed in with {{ user_info['email'] }} 
+        <a href="{{ url_for('logout') }}">
+        <button class="btn-red" style="margin-left: 10px;">Sign Out</button>
+        </a>
+    </p>
+    <p><b>Current Indian Time:</b> {{ indian_time }}</p>
+    <hr>
+    <h3>Generate Pattern</h3>
+    <form action="{{ url_for('pattern') }}" method="POST">
+        <input type="number" name="lines" placeholder="Enter number of lines" required>
+        <button type="submit" class="btn-green">Generate</button>
+    </form>
+
+    {% if output %}
+    <hr>
+    <h3>Generated Pattern</h3>
+    <pre class="pattern">{{ output | safe }}</pre>
+    {% endif %}
+</body>
+</html>
