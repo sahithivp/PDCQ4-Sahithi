@@ -23,6 +23,37 @@ SCOPES = [
     "https://www.googleapis.com/auth/userinfo.profile"
 ]
 
+def generate_pattern(n):
+    WORD = "FORMULAQSOLUTIONS"
+    Length = len(WORD)
+
+    lengths = []
+    for i in range(n):
+        if i <= n // 2:
+            lengths.append(1 + 2 * i)
+        else:
+            lengths.append(lengths[n - i - 1])
+
+    max_length = max(lengths)
+    rows = []
+
+    for row in range(n):
+        length = lengths[row]
+        start = row % Length
+
+        if row % 2 == 1 and length > 2:  
+            full_word = WORD[start] + "-" * (length - 2) + WORD[(start + length - 1) % Length]
+        else:  
+            full_word = ""
+            for k in range(length):
+                full_word += WORD[(start + k) % Length]
+
+        spaces = " " * ((max_length - length) // 2)
+        rows.append(f"{spaces}{''.join(full_word)}")
+
+    return "<pre>" + "\n".join(rows) + "</pre>"
+
+
 
 @app.route("/")
 def index():
@@ -40,7 +71,7 @@ def index():
             <h2>Flask Google Login</h2>
             <a href="/login">
             <button style='padding:8px 14px; background:red; color:white; border:none; border-radius:6px; cursor:pointer;'>
-              Login with Google
+                Login with Google
             </button>
             </a>
         """)
@@ -112,12 +143,31 @@ def callback():
                 Sign Out
             </button>
         </a>
+        <hr>
+        <h3>Generate Pattern</h3>
+        <form action="/pattern" method="POST">
+            <input type="number" name="lines" placeholder="Enter number of lines" required>
+            <button type="submit" 
+                style="padding:8px 14px; background:green; color:white; border:none; border-radius:6px; cursor:pointer;">
+                Generate
+            </button>
+        </form>
     """
 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("index"))
+
+@app.route("/pattern", methods=["POST"])
+def pattern():
+    if "state" not in session:
+        return redirect(url_for("index"))
+
+    n = int(request.form["lines"])
+    output = generate_pattern(n)
+    return f"<pre>{output}</pre><br><a href='/'>Back</a>"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
